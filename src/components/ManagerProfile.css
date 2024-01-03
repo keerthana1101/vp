@@ -1,0 +1,36 @@
+.manager-profile {
+    font-family: 'Montserrat';
+    padding: 20px;
+    text-align: center;
+}
+
+
+.manager-profile h3 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.manager-profile table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.manager-profile th {
+    background-color: #f2f2f2;
+    padding: 10px;
+    text-align: left;
+}
+
+.manager-profile td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.manager-profile tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.manager-profile tbody tr:hover {
+    background-color: #e2e2e2;
+    cursor: pointer;
+}

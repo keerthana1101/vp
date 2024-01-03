@@ -1,0 +1,28 @@
+.rejected-leave-requests {
+    margin: 20px;
+    font-family: 'Montserrat'; 
+    text-align: center;
+  }
+  
+  .rejected-leave-requests h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .rejected-leave-requests table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .rejected-leave-requests th,
+  .rejected-leave-requests td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .rejected-leave-requests th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  
