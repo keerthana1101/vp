@@ -9,7 +9,7 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('employeeName');
-    navigate('/login');
+    navigate('/');
   };
   
   useEffect(() => {

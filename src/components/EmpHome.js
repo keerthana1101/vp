@@ -7,13 +7,18 @@ function LeaveForm() {
     const [leaveType, setLeaveType] = useState('');
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
-    const [description, setDescription] = useState('');
     const [error, setError] = useState('');
+    const [role,setRole]=useState('');
+    const [compOffComment, setCompOffComment] = useState('');
 
     useEffect(() => {
         const retrievedEmployeeName = localStorage.getItem('employeeName'); // Retrieve from localStorage
         setEmployeeName(retrievedEmployeeName || ''); 
+        const retrievedRole = localStorage.getItem('role');  // Retrieve role from localStorage
+        setRole(retrievedRole || '');
     }, []);
+
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -23,7 +28,7 @@ function LeaveForm() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ employeeName,leaveType, fromDate, toDate, description })
+            body: JSON.stringify({ employeeName,role,leaveType, fromDate, toDate, compOffComment,})
         })
         
         .then(response => {
@@ -64,8 +69,7 @@ function LeaveForm() {
 
     return (
         <div className="leave-form">
-            <h1>Apply for Leave</h1>
-            
+            <h1>Apply for Leave</h1>          
             <form onSubmit={handleSubmit}>
             <label>
                     Employee Name:
@@ -76,15 +80,44 @@ function LeaveForm() {
                     />
                 </label>
                 <label>
+                    Department:
+                    <input
+                    type="text"
+                    value={role}
+                    readOnly/>
+                </label>
+                <label>
                     Leave Type:
                     <select value={leaveType} onChange={(e) => setLeaveType(e.target.value)}>
+                       setCompOffComment('');
                         <option value="">Select Leave Type</option>
-                        <option value="sick">Sick Leave</option>
-                        <option value="vacation">Vacation Leave</option>
-                        <option value="Casual Leave">Casual Leave</option>
-                        <option value="Others">Others</option>
+                        <option value="Planned Vacation">Planned Vacation(V)</option>
+                        <option value="Half-day Vacation">Half-day Vacation(H)</option>
+                        <option value="Compensatory Off">Compensatory Off(C)</option>
+                        <option value="Sick Leave">Sick Leave(S)</option>
+                        <option value="others">Others</option>
                     </select>
                 </label>
+                {leaveType === 'Compensatory Off' && (
+                    <label>
+                        Comp off for which IBM Holiday:
+                        <input
+                            type="text"
+                            value={compOffComment}
+                            onChange={(e) => setCompOffComment(e.target.value)}
+                        />
+                    </label>
+                )}
+                {leaveType === 'others' && (
+                    <label>
+                        Training, UR Session or anything relevant:
+                        <input
+                            type="text"
+                            value={compOffComment}
+                            onChange={(e) => setCompOffComment(e.target.value)}
+                        />
+                    </label>
+                )}
                 <label>
                     From Date:
                     <input
@@ -100,10 +133,6 @@ function LeaveForm() {
                         value={toDate}
                         onChange={(e) => handleToDateChange(e.target.value)}
                     />
-                </label>
-                <label>
-                    Description:
-                    <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
                 </label>
                 {error && <p className="error-message">{error}</p>}
                 <button type="submit" disabled={error}>Apply</button>

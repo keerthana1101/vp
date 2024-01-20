@@ -13,6 +13,7 @@ const leavesDb = nano.db.use(leaveDbName);
 const adminDb = nano.db.use(adminDbName);
 
 
+
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -44,7 +45,7 @@ nano.db.create(leaveDbName)
 
   const adminData = {
     email: 'manager@gmail.com',
-    passwordHash: '$2b$10$knO9piTLpUxlUqoxJz21A.Tx/baYpjwXsXRfeqRtyY4CtM8VQYyEi',
+    passwordHash: "$2b$10$AgaPYHEo1cRFjfGu1LUpQehZNxOYGD2iCKWVmTVRO8AGGinhtAlB.",
   };
    
   app.use(session({
@@ -57,18 +58,19 @@ nano.db.create(leaveDbName)
 // Employee Registration
 app.post('/signup', async (req, res) => {
   try {
-    const { email, password, employeeName } = req.body; 
+    const { email, password, employeeName, role } = req.body; 
     console.log("received request");
     console.log(email);
     console.log(password);
-    console.log(employeeName); 
+    console.log(employeeName);
+    console.log(role);
     const existingUser = await usersDb.get(email).catch(() => null);
     if (existingUser) {
       console.log("user already exists");
       return res.status(400).json({ error: 'User already exists' });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = { password: hashedPassword, email, employeeName }; // Include employeeName in the user object
+    const user = { password: hashedPassword, email, employeeName,role }; // Include employeeName in the user object
     const result = await usersDb.insert(user);
     console.log("registration success :: ", result.id);
     res.json({ message: 'Registration successful', userId: result.id });
@@ -91,7 +93,7 @@ app.post('/login', async (req, res) => {
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
-  res.json({ message: 'Login successful', isManager: !!user.isManager,employeeName: user.employeeName });
+  res.json({ message: 'Login successful', isManager: !!user.isManager,employeeName: user.employeeName,role:user.role });
 });
 
 
@@ -130,8 +132,8 @@ app.put('/admin/updatePassword', async (req, res) => {
 
 
 app.post('/applyLeave', async (req, res) => {
-  const { leaveType, fromDate, toDate, description, employeeName } = req.body;
-
+  const { leaveType, fromDate, toDate,employeeName,role,compOffComment } = req.body;
+  console.log('Received request payload:', req.body);
   try {
     const leavesWithinRange = await leavesDb.find({
       selector: {
@@ -145,7 +147,7 @@ app.post('/applyLeave', async (req, res) => {
     if (leavesWithinRange.docs.length >= 3) {
       return res.status(400).json({ error : 'The limit of approved leaves for this period is exceeded' });
     }
-    const leaveData = { leaveType, fromDate, toDate, description, employeeName,status: 'Pending'};
+    const leaveData = { leaveType, fromDate, toDate, employeeName,role,compOffComment,status: 'Pending'};
     const result = await leavesDb.insert(leaveData);
     console.log('Leave application saved successfully:', result);
     res.status(200).json({ message: 'Leave application submitted successfully' });
@@ -160,8 +162,8 @@ app.get('/leaveRequests', async (req, res) => {
   try {
     const allLeaves = await leavesDb.list({ include_docs: true }); 
     const leaveRequests = allLeaves.rows.map(row => {
-      const { leaveType, fromDate, toDate, description, status, _id, employeeName } = row.doc;
-      return { leaveType, fromDate, toDate, description, status, _id,employeeName};
+      const { leaveType, fromDate, toDate,status, _id, employeeName,role,compOffComment} = row.doc;
+      return { leaveType, fromDate, toDate, status, _id,employeeName,role,compOffComment};
     });
     res.json(leaveRequests);
   } catch (error) {
@@ -251,8 +253,8 @@ app.get('/approvedLeaveRequests', async (req, res) => {
     const approvedLeaveRequests = allLeaves.rows
       .filter(row => row.doc.status === 'Approved')
       .map(row => {
-        const { leaveType, fromDate, toDate, description, status, _id, employeeName } = row.doc;
-        return { leaveType, fromDate, toDate, description, status, _id, employeeName };
+        const { leaveType, fromDate, toDate,  status, _id, employeeName } = row.doc;
+        return { leaveType, fromDate, toDate, status, _id, employeeName };
       });
     res.json(approvedLeaveRequests);
   } catch (error) {
@@ -268,8 +270,8 @@ app.get('/rejectedLeaveRequests', async (req, res) => {
     const rejectedLeaveRequests = allLeaves.rows
       .filter(row => row.doc.status === 'Rejected')
       .map(row => {
-        const { leaveType, fromDate, toDate, description, status, _id, employeeName } = row.doc;
-        return { leaveType, fromDate, toDate, description, status, _id, employeeName };
+        const { leaveType, fromDate, toDate, status, _id, employeeName } = row.doc;
+        return { leaveType, fromDate, toDate,status, _id, employeeName };
       });
 
     res.json(rejectedLeaveRequests);
@@ -281,12 +283,11 @@ app.get('/rejectedLeaveRequests', async (req, res) => {
 
 
 app.post('/EmpHome', (req, res) => {
-    const { leaveType, fromDate, toDate, description } = req.body;
+    const { leaveType, fromDate, toDate} = req.body;
     console.log('Received leave application:');
     console.log('Leave Type:', leaveType);
     console.log('From Date:', fromDate);
     console.log('To Date:', toDate);
-    console.log('Description:', description);
     res.status(200).send('Leave application submitted successfully');
 });
 

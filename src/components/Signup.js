@@ -9,7 +9,8 @@ function Signup() {
     const [password, setPassword] = useState('');
     const [employeeName, setEmployeeName] = useState('');
     const [registrationSuccess, setRegistrationSuccess] = useState(false);
-
+    const [role, setRole] = useState('');
+    const roles = ['PER', 'Mapping', 'Reporting','Cross-skilled'];
     async function submit(e) {
         e.preventDefault();
 
@@ -18,6 +19,7 @@ function Signup() {
                 email,
                 password,
                 employeeName, 
+                role,
             }, {
                 headers: {
                     'Content-Type': 'application/json'
@@ -31,8 +33,10 @@ function Signup() {
                 setEmail('');
                 setPassword('');
                 setEmployeeName('');
+                setRole('');
 
                 localStorage.setItem('employeeName', employeeName);
+                localStorage.setItem('role',role);
             } else {
                 alert("Error occurred during registration");
             }
@@ -53,6 +57,15 @@ function Signup() {
                 </div>
                 <div className="input-container">
                     <input type="text" value={employeeName} onChange={(e) => setEmployeeName(e.target.value)} placeholder="Employee Name" />
+                </div>
+                <div className="input-container">
+                    <label htmlFor="role">Department:</label>
+                    <select id="role" value={role} onChange={(e) => setRole(e.target.value)}>
+                        <option value="" disabled>Select Department</option>
+                        {roles.map((roleOption, index) => (
+                            <option key={index} value={roleOption}>{roleOption}</option>
+                        ))}
+                    </select>
                 </div>
                 <div className="input-container">
                     <input type="submit" value="Signup" />

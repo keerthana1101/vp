@@ -25,6 +25,7 @@ function Login() {
 
             if (response.status === 200) {
                 localStorage.setItem('employeeName',response.data.employeeName)
+                localStorage.setItem('role',response.data.role)
                 localStorage.setItem('isLogin',true)
                 setLoginSuccess(true);
                 

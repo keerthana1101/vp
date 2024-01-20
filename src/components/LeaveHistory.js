@@ -25,7 +25,6 @@ function LeaveHistory() {
                         <th>Leave Type</th>
                         <th>From Date</th>
                         <th>To Date</th>
-                        <th>Description</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -35,7 +34,6 @@ function LeaveHistory() {
                             <td>{request.leaveType}</td>
                             <td>{request.fromDate}</td>
                             <td>{request.toDate}</td>
-                            <td>{request.description}</td>
                             <td>{request.status}</td>
                         </tr>
                     ))}

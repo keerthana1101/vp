@@ -8,7 +8,6 @@ function LeaveRequests() {
         leaveType: '',
         fromDate: '',
         toDate: '',
-        description: ''
     });
 
     const fetchLeaveRequests = async () => {
@@ -17,7 +16,13 @@ function LeaveRequests() {
             if (response.ok) {
                 const data = await response.json();
                 console.log('Fetched leave requests:', data); 
-                setLeaveRequests(data);
+                const leaveRequestsWithCompOff = data.map(request => ({
+                    ...request,
+                    leaveType: (request.leaveType === 'Compensatory Off' || request.leaveType === 'others') 
+                    ? `${request.leaveType} - ${request.compOffComment}` 
+                    : request.leaveType,
+                }));
+                setLeaveRequests(leaveRequestsWithCompOff);
             } else {
                 console.error('Error fetching leave requests:', response.statusText);
             }
@@ -91,7 +96,6 @@ const editLeave = async (id) => {
                 leaveType: leaveRequest.leaveType,
                 fromDate: leaveRequest.fromDate,
                 toDate: leaveRequest.toDate,
-                description: leaveRequest.description
             });
         } else {
             console.error(`Failed to fetch leave request for editing with ID ${id}`);
@@ -142,19 +146,18 @@ const editLeave = async (id) => {
                         <th>Leave Type</th>
                         <th>From Date</th>
                         <th>To Date</th>
-                        <th>Description</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {leaveRequests.map(request => (
+                        request.role=='PER' && (
                         <tr key={request._id}>
                             <td>{request.employeeName}</td>
                             <td>{request.leaveType}</td>
                             <td>{request.fromDate}</td>
                             <td>{request.toDate}</td>
-                            <td>{request.description}</td>
                             <td>{request.status}</td>
                             <td>
                                 <button onClick={() => editLeave(request._id)}>Edit</button>
@@ -162,6 +165,7 @@ const editLeave = async (id) => {
                                  <button onClick={() => rejectLeave(request._id)}>Reject</button>
                             </td>
                         </tr>
+                        )
                     ))}
                 </tbody>
             </table>
@@ -178,9 +182,7 @@ const editLeave = async (id) => {
     
                         <label htmlFor="toDate">To Date:</label>
                         <input type="date" id="toDate" name="toDate" value={editedRequest.toDate} onChange={handleEditChange} />
-    
-                        <label htmlFor="description">Description:</label>
-                        <textarea id="description" name="description" value={editedRequest.description} onChange={handleEditChange} />
+
     
                         <button onClick={saveEditedLeave}>Save</button>
                     </form>
